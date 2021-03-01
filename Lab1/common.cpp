@@ -12,6 +12,6 @@ namespace geometry {
 }
 
 bool isEquals(double a, double b) {
-	int exp = 1e-5;
+	double exp = 1e-5;
 	return (std::abs(a - b) <= exp);
 }
