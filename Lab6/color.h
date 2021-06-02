@@ -1,9 +1,10 @@
 #pragma once
+#include"GLFW/glfw3.h"
 
 struct Color {
-	float r;
-	float g;
-	float b;
+	GLfloat r;
+	GLfloat g;
+	GLfloat b;
 };
 
 bool operator==(const Color&, const Color&);

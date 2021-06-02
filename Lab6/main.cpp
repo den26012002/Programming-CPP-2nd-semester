@@ -41,10 +41,17 @@ int main(void)
             system("cls");
         }*/
         RubicsCube cube;
+        RubicsCube anotherCube;
         //cube.loadConfig("config.txt");
+        //randomShuffle(cube);
+        //std::cout << beginnerLevelSolveAlgorithm(cube);
+        srand(time(NULL));
         randomShuffle(cube);
-        RubicsCubeGUI cubeGUI(cube);
+        //std::cout << beginnerLevelSolveAlgorithm(cube) << '\n';
+        //cube.logConfig();
+        RubicsCubeGUI& cubeGUI = RubicsCubeGUI::Instance(cube);
         cubeGUI.play();
+        //cubeGUI.makeAlgorithmStep(beginnerLevelSolveAlgorithm);
         
     } catch (char str) {
         std::cerr << str;

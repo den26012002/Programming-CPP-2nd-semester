@@ -36,3 +36,29 @@ void drawSmallCube(const SmallCube& cube, const Coordinates& coords, GLfloat siz
 	drawQuads(std::vector<Coordinates>({ points[4], points[5], points[6], points[7] }), cube.getDown());
 	drawQuads(std::vector<Coordinates>({ points[0], points[1], points[2], points[3] }), cube.getUp());
 }
+
+//void drawRubicsCube(const RubicsCube& cube, const Coordinates& coords, GLfloat size) {
+//	for (int x(0); x < 3; ++x) {
+//		for (int y(0); y < 3; ++y) {
+//			for (int z(0); z < 3; ++z) {
+//				Coordinates leftUpFrontAngle = coords;
+//				if (x == 1) {
+//					leftUpFrontAngle.x += size;
+//				} else if (x == 2) {
+//					leftUpFrontAngle.x += 2 * size;
+//				}
+//				if (y == 1) {
+//					leftUpFrontAngle.y -= size;
+//				} else if (y == 2) {
+//					leftUpFrontAngle.y -= 2 * size;
+//				}
+//				if (z == 1) {
+//					leftUpFrontAngle.z -= size;
+//				} else if (z == 2) {
+//					leftUpFrontAngle.z -= 2 * size;
+//				}
+//				drawSmallCube(cube.getCube(x, y, z), leftUpFrontAngle, size);
+//			}
+//		}
+//	}
+//}

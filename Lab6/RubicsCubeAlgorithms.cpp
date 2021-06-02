@@ -453,7 +453,7 @@ std::string beginnerLevelSolveAlgorithm(RubicsCube& cube) {
 					break;
 				}
 				cube.Y();
-				solveSequence += 'U';
+				solveSequence += 'Y';
 			}
 			if (cube.getCube(0, 0, 0).hasColor(frontColor) && cube.getCube(0, 0, 0).hasColor(leftColor)) {
 				while (!cube.getCube(0, 0, 2).hasColor(leftColor)) {
