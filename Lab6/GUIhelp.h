@@ -14,5 +14,3 @@ struct Coordinates {
 void drawQuads(const std::vector<Coordinates>&, const Color&);
 
 void drawSmallCube(const SmallCube&, const Coordinates&, GLfloat size);
-
-//void drawRubicsCube(const RubicsCube&, const Coordinates&, GLfloat size);

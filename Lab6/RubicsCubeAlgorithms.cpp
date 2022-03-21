@@ -121,6 +121,9 @@ std::string swapUpAngles(RubicsCube& cube) {
 }
 
 std::string beginnerLevelSolveAlgorithm(RubicsCube& cube) {
+	if (cube.isUnsolvable()) {
+		throw "Unable to solve";
+	}
 	std::string solveSequence = "";
 	const Color& downColor = cube.getDownColor();
 	//flower
@@ -378,6 +381,14 @@ std::string beginnerLevelSolveAlgorithm(RubicsCube& cube) {
 	//up cross
 	{
 		const Color& upColor = cube.getUpColor();
+		int cntCorrect = 1;
+		cntCorrect += (cube.getCube(1, 0, 0).getUp() == upColor);
+		cntCorrect += (cube.getCube(0, 0, 1).getUp() == upColor);
+		cntCorrect += (cube.getCube(1, 0, 2).getUp() == upColor);
+		cntCorrect += (cube.getCube(2, 0, 1).getUp() == upColor);
+		if (cntCorrect != 1 && cntCorrect != 3 && cntCorrect != 5) {
+			throw "Unable to solve (up cross)";
+		}
 		if (cube.getCube(1, 0, 0).getUp() != upColor &&
 			cube.getCube(0, 0, 1).getUp() != upColor &&
 			cube.getCube(1, 0, 2).getUp() != upColor &&
@@ -390,7 +401,7 @@ std::string beginnerLevelSolveAlgorithm(RubicsCube& cube) {
 			cube.getCube(1, 0, 2).getUp() != upColor ||
 			cube.getCube(2, 0, 1).getUp() != upColor) 
 		{
-			while (true) {
+			for (int i(0); i < 96; ++i) {
 				if (cube.getCube(0, 0, 1).getUp() == upColor) {
 					if (cube.getCube(1, 0, 2).getUp() == upColor) {
 						solveSequence += rTriggerWithFront(cube);
@@ -447,6 +458,14 @@ std::string beginnerLevelSolveAlgorithm(RubicsCube& cube) {
 		const Color& leftColor = cube.getLeftColor();
 		const Color& backColor = cube.getBackColor();
 		const Color& rightColor = cube.getRightColor();
+		int cntCorrect = 0;
+		cntCorrect += (cube.getCube(0, 0, 0).hasColor(frontColor) && cube.getCube(0, 0, 0).hasColor(leftColor));
+		cntCorrect += (cube.getCube(0, 0, 2).hasColor(leftColor) && cube.getCube(0, 0, 2).hasColor(backColor));
+		cntCorrect += (cube.getCube(2, 0, 2).hasColor(backColor) && cube.getCube(2, 0, 2).hasColor(rightColor));
+		cntCorrect += (cube.getCube(2, 0, 0).hasColor(rightColor) && cube.getCube(2, 0, 0).hasColor(frontColor));
+		if (cntCorrect != 0 && cntCorrect != 1 && cntCorrect != 4) {
+			throw "Unable to solve (incorrect angles)";
+		}
 		for (int k(0); k < 2; ++k) {
 			for (int i(0); i < 4; ++i) {
 				if (cube.getCube(0, 0, 0).hasColor(frontColor) && cube.getCube(0, 0, 0).hasColor(leftColor)) {
@@ -491,6 +510,9 @@ std::string beginnerLevelSolveAlgorithm(RubicsCube& cube) {
 				cube.D();
 				solveSequence += 'D';
 			}
+		}
+		if (!cube.isSolved()) {
+			throw "Unable to solve (cube wasn't solved)";
 		}
 	}
 

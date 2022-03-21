@@ -1,5 +1,9 @@
 #include "ButtonGUI.h"
 #include<iostream>
+#include<fstream>
+#include<thread>
+
+class ButtonGUI;
 
 ButtonGUI::ButtonGUI(RubicsCubeGUI& _connectedCubeGUI) :
 	Button::Button(),
@@ -13,6 +17,7 @@ ButtonGUI::ButtonGUI(RubicsCubeGUI& _connectedCubeGUI) :
 {
 	addOnCoverFunction(changeColorOnCover);
 	addOnClickFunction(changeColorOnClick);
+	addIdleFunction(changeColorOnIdle);
 }
 
 //ButtonGUI::ButtonGUI(const std::vector<void(*)()>& _onCoverFunctions, const std::vector<void(*)()>& _onClickFunctions) :
@@ -35,6 +40,7 @@ ButtonGUI::ButtonGUI(RubicsCubeGUI& _connectedCubeGUI, const Coordinates& _leftU
 {
 	addOnCoverFunction(changeColorOnCover);
 	addOnClickFunction(changeColorOnClick);
+	addIdleFunction(changeColorOnIdle);
 }
 
 void ButtonGUI::setPos(const Coordinates& _leftUpAngleCoords) {
@@ -61,6 +67,10 @@ const Color& ButtonGUI::getColor() const {
 	return color;
 }
 
+RubicsCubeGUI& ButtonGUI::getConnectedGUI() const {
+	return connectedCubeGUI;
+}
+
 void ButtonGUI::draw() {
 	glPushMatrix();
 	glLoadIdentity();
@@ -82,15 +92,22 @@ void ButtonGUI::draw() {
 //	onClickFunctions.push_back(func);
 //}
 
-void ButtonGUI::callback() {
-	if (isClicked) {
-		onClick();
-	} else if (isCovered) {
-		onCover();
-	} else {
-		color = mainColor;
-	}
-}
+//void ButtonGUI::callback() {
+//	if (isActive) {
+//		if (isClicked) {
+//			if (!wasActionOnClick) {
+//				onClick();
+//				wasActionOnClick = true;
+//			}
+//		} else if (isCovered) {
+//			onCover();
+//		} else {
+//			color = mainColor;
+//		}
+//	} else {
+//		idle();
+//	}
+//}
 
 void ButtonGUI::cursorCallback(int windowWidth, int windowHeight, double xPos, double yPos) {
 	xPos = (xPos - (double)windowWidth / 2) / (double)windowWidth * 2;
@@ -113,22 +130,24 @@ void ButtonGUI::mouseButtonCallback(int button, int action, int mods) {
 				isClicked = true;
 			} else if (action == GLFW_RELEASE) {
 				isClicked = false;
+				wasActionOnClick = false;
 			}
 		}
 	}
 }
 
-void ButtonGUI::onCover() {
-	for (int i(0); i < onCoverFunctions.size(); ++i) {
-		onCoverFunctions[i](*this);
-	}
-}
+//void ButtonGUI::onCover() {
+//	for (int i(0); i < onCoverFunctions.size(); ++i) {
+//		onCoverFunctions[i](*this);
+//	}
+//}
 
-void ButtonGUI::onClick() {
-	for (int i(0); i < onClickFunctions.size(); ++i) {
-		onClickFunctions[i](*this);
-	}
-}
+//void ButtonGUI::onClick() {
+//	for (int i(0); i < onClickFunctions.size(); ++i) {
+//		onClickFunctions[i](*this);
+//	}
+//}
+
 
 //void ButtonGUI::coverCallback() {
 //	if (!isCovered) {
@@ -146,10 +165,38 @@ void changeColorOnClick(ButtonGUI& button) {
 	button.setColor(button.onClickColor);
 }
 
-void solveOnClick(ButtonGUI& cube) {
-	cube.connectedCubeGUI.makeAlgorithmStep(beginnerLevelSolveAlgorithm);
+void changeColorOnIdle(ButtonGUI& button) {
+	button.setColor(button.mainColor);
 }
 
-void shuffleOnClick(ButtonGUI& cube) {
-	cube.connectedCubeGUI.makeAlgorithmStep(randomShuffle);
+void solveOnClick(ButtonGUI& button) {
+	try {
+		button.connectedCubeGUI.makeAlgorithmStep(beginnerLevelSolveAlgorithm);
+	} catch (...) {
+		std::cerr << "This configuration is unsolvable, please load another file\n";
+	}
+}
+
+void shuffleOnClick(ButtonGUI& button) {
+	button.connectedCubeGUI.makeAlgorithmStep(randomShuffle);
+}
+
+void logOnClick(ButtonGUI& button) {
+	button.getConnectedGUI().getCube().logConfig();
+}
+
+void saveOnClick(ButtonGUI& button) {
+	std::string filename;
+	std::cin >> filename;
+	button.getConnectedGUI().getCube().saveConfig(filename);
+}
+
+void loadOnClick(ButtonGUI& button) {
+	std::string filename;
+	std::cin >> filename;
+	try {
+		button.getConnectedGUI().getCube().loadConfig(filename);
+	} catch (...) {
+		std::cerr << "Error file format or file doesn't exist";
+	}
 }

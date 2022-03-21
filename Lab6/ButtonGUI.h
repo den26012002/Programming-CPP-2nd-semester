@@ -5,6 +5,8 @@
 #include"RubicsCubeAlgorithms.h"
 #include<vector>
 
+class RubicsCubeGUI;
+
 typedef Coordinates Sizes;
 
 class ButtonGUI : public Button<ButtonGUI> {
@@ -26,9 +28,11 @@ public:
 
 	const Color& getColor() const;
 
+	RubicsCubeGUI& getConnectedGUI() const;
+
 	void draw();
 
-	void callback() override;
+	//void callback() override;
 
 	void cursorCallback(int windowWidth, int windowHeight, double xPos, double yPos);
 
@@ -43,15 +47,17 @@ private:
 	Color onCoverColor;
 	Color onClickColor;
 
-	void onCover() override;
+	//void onCover() override;
 	
-	void onClick() override;
+	//void onClick() override;
 
 	//void coverCallback();
 
 	friend void changeColorOnCover(ButtonGUI&);
 
 	friend void changeColorOnClick(ButtonGUI&);
+
+	friend void changeColorOnIdle(ButtonGUI&);
 
 	friend void solveOnClick(ButtonGUI&);
 	
@@ -62,6 +68,14 @@ void changeColorOnCover(ButtonGUI&);
 
 void changeColorOnClick(ButtonGUI&);
 
-void solveOnClick(ButtonGUI& cube);
+void changeColorOnIdle(ButtonGUI&);
 
-void shuffleOnClick(ButtonGUI& cube);
+void solveOnClick(ButtonGUI&);
+
+void shuffleOnClick(ButtonGUI&);
+
+void logOnClick(ButtonGUI&);
+
+void saveOnClick(ButtonGUI& button);
+
+void loadOnClick(ButtonGUI& button);

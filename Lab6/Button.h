@@ -6,8 +6,18 @@ class Button {
 public:
 	Button() :
 		isCovered(false),
-		isClicked(false)
+		isClicked(false),
+		wasActionOnClick(false),
+		isActive(true)
 	{}
+
+	bool active() {
+		return isActive;
+	}
+
+	void setActive(bool state) {
+		isActive = state;
+	}
 
 	void addOnCoverFunction(void(*func)(ButtonType&)) {
 		onCoverFunctions.push_back(func);
@@ -17,21 +27,53 @@ public:
 		onClickFunctions.push_back(func);
 	}
 
-	virtual void callback() = 0;
+	void addIdleFunction(void(*func)(ButtonType&)) {
+		idleFunctions.push_back(func);
+	}
 
-	virtual ~Button() = default;
+	void callback() {
+		if (isActive) {
+			if (isClicked) {
+				if (!wasActionOnClick) {
+					onClick();
+					wasActionOnClick = true;
+				}
+			} else if (isCovered) {
+				onCover();
+			} else {
+				idle();
+			}
+		} else {
+			idle();
+		}
+	};
 
 protected:
 	std::vector<void(*)(ButtonType&)> onCoverFunctions;
 	std::vector<void(*)(ButtonType&)> onClickFunctions;
+	std::vector<void(*)(ButtonType&)> idleFunctions;
 	bool isCovered;
 	bool isClicked;
+	bool wasActionOnClick;
+	bool isActive;
 
-	//virtual void idle() = 0;
+	void idle() {
+		for (int i(0); i < idleFunctions.size(); ++i) {
+			idleFunctions[i](*(static_cast<ButtonType*>(this)));
+		}
+	}
 
-	virtual void onCover() = 0;
+	void onCover() {
+		for (int i(0); i < onCoverFunctions.size(); ++i) {
+			onCoverFunctions[i](*(static_cast<ButtonType*>(this)));
+		}
+	}
 
-	virtual void onClick() = 0;
+	void onClick() {
+		for (int i(0); i < onClickFunctions.size(); ++i) {
+			onClickFunctions[i](*(static_cast<ButtonType*>(this)));
+		}
+	};
 };
 
 /*template<typename ButtonType>

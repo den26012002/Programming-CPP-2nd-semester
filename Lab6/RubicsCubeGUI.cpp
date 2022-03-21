@@ -9,29 +9,17 @@
 #include"ButtonGUI.h"
 #include<iostream>
 
-static std::string curAlgorithmStr;
-
-static GLfloat xAngle = 25.0f;
-static GLfloat yAngle = 25.0f;
-static const GLfloat xBorder = 35.0f;
-static const GLfloat yBorder = 35.0f;
-static int curMods;
-static const int windowWidth = 1000;
-static const int windowHeight = 800;
-
 static std::vector<ButtonGUI> buttonsGUI;
 
-static void rotationsCallback(GLFWwindow*, int key, int scancode, int action, int mods);
-
-static void cursorCallback(GLFWwindow* window, double xPos, double yPos);
-
-static void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
-
-static void scrollCallback(GLFWwindow* window, double xoffset, double yoffset);
+static void switchButtonsActivityOnClick(ButtonGUI&);
 
 RubicsCubeGUI& RubicsCubeGUI::Instance(RubicsCube& cube) {
     static RubicsCubeGUI rubicsCubeGUI(cube);
     return rubicsCubeGUI;
+}
+
+RubicsCube& RubicsCubeGUI::getCube() const {
+    return cube;
 }
 
 void RubicsCubeGUI::play() {
@@ -61,6 +49,12 @@ void RubicsCubeGUI::play() {
     buttonsGUI[0].addOnClickFunction(solveOnClick);
     buttonsGUI.push_back(ButtonGUI(*this, { -1, 0.9f, 0 }, { 0.5f, 0.1f, 0 }, { 0.75f, 0, 0 }, { 1, 0, 0 }, { 1, 0, 1 }));
     buttonsGUI[1].addOnClickFunction(shuffleOnClick);
+    buttonsGUI.push_back(ButtonGUI(*this, { -1, 0.8f, 0 }, { 0.5f, 0.1f, 0 }, { 0, 0, 0.75f }, { 0, 0, 1 }, { 1, 0, 1 }));
+    buttonsGUI[2].addOnClickFunction(logOnClick);
+    buttonsGUI.push_back(ButtonGUI(*this, { -1, 0.7f, 0 }, { 0.5f, 0.1f, 0 }, { 0.75f, 0.75f, 0 }, { 1, 1, 0 }, { 1, 0, 1 }));
+    buttonsGUI[3].addOnClickFunction(saveOnClick);
+    buttonsGUI.push_back(ButtonGUI(*this, { -1, 0.6f, 0 }, { 0.5f, 0.1f, 0 }, { 0, 0.75f, 0.75f }, { 0, 1, 1 }, { 1, 0, 1 }));
+    buttonsGUI[4].addOnClickFunction(loadOnClick);
 
     glEnable(GL_DEPTH_TEST);
     glLoadIdentity();
@@ -111,6 +105,9 @@ void RubicsCubeGUI::makeAlgorithmStep(const std::string& algorithm) {
     if (curAlgorithmStr != algorithm) {
         curAlgorithmStr = algorithm;
         i = 0;
+    }
+    if (i == 0 && curAlgorithmStr != "") {
+        std::cout << "Algorithm now: " << curAlgorithmStr << '\n';
     }
     if (i >= algorithm.size()) {
         i = 0;
@@ -227,7 +224,7 @@ RubicsCubeGUI::RubicsCubeGUI(RubicsCube& _cube) :
 
 
 
-static void rotationsCallback(GLFWwindow*, int key, int scancode, int action, int mods) {
+void RubicsCubeGUI::rotationsCallback(GLFWwindow*, int key, int scancode, int action, int mods) {
     if (action == GLFW_PRESS) {
         switch (key) {
         case GLFW_KEY_F:
@@ -267,21 +264,21 @@ static void rotationsCallback(GLFWwindow*, int key, int scancode, int action, in
     curMods = mods;
 }
 
-static void cursorCallback(GLFWwindow* window, double xPos, double yPos) {
+void RubicsCubeGUI::cursorCallback(GLFWwindow* window, double xPos, double yPos) {
     //std::cout << xPos << ' ' << yPos << '\n';
     for (int i(0); i < buttonsGUI.size(); ++i) {
         buttonsGUI[i].cursorCallback(windowWidth, windowHeight, xPos, yPos);
     }
 }
 
-static void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods) {
+void RubicsCubeGUI::mouseButtonCallback(GLFWwindow* window, int button, int action, int mods) {
     //std::cout << "Click\n";
     for (int i(0); i < buttonsGUI.size(); ++i) {
         buttonsGUI[i].mouseButtonCallback(button, action, mods);
     }
 }
 
-static void scrollCallback(GLFWwindow* window, double xoffset, double yoffset) {
+void RubicsCubeGUI::scrollCallback(GLFWwindow* window, double xoffset, double yoffset) {
     if (curMods & GLFW_MOD_CONTROL) {
         yAngle += yoffset;
         if (yAngle < -yBorder) {
@@ -309,4 +306,10 @@ static void scrollCallback(GLFWwindow* window, double xoffset, double yoffset) {
     }
     //std::cout << xAngle << ' ' << yAngle << '\n';
    
+}
+
+static void switchButtonsActivityOnClick(ButtonGUI&) {
+    for (int i(0); i < buttonsGUI.size(); ++i) {
+        buttonsGUI[i].setActive(!buttonsGUI[i].active());
+    }
 }

@@ -97,6 +97,9 @@ bool SmallCube::hasColor(const Color& color) const {
 }
 
 SmallCube& SmallCube::operator=(const SmallCube& other) {
+	if (this == &other) {
+		return *this;
+	}
 	for (int i(0); i < 6; ++i) {
 		sides[i] = other.sides[i];
 	}

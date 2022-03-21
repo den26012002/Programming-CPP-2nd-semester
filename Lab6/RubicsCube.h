@@ -28,6 +28,7 @@ public:
 	void Zr();
 
 	bool isSolved() const;
+	bool isUnsolvable() const;
 
 	const SmallCube& getCube(short x, short y, short z) const;
 
@@ -43,8 +44,10 @@ public:
 	void saveConfig(const std::string& fileName) const;
 	void logConfig() const;
 
+	RubicsCube& operator=(const RubicsCube&);
 private:
 	SmallCube cubes[3][3][3]; //1 - x coordinate, 2 - y, 3 - z (from left-upper corner of the screen)
+	bool solvable;
 
 	void saveConfig(std::ostream&) const;
 

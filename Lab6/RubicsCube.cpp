@@ -3,8 +3,11 @@
 #include<fstream>
 #include<algorithm>
 #include<vector>
+#include<map>
 
-RubicsCube::RubicsCube() {
+RubicsCube::RubicsCube() :
+	solvable(true)
+{
 	for (int x(0); x < 3; ++x) {
 		for (int y(0); y < 3; ++y) {
 			for (int z(0); z < 3; ++z) {
@@ -269,6 +272,10 @@ bool RubicsCube::isSolved() const {
 	return true;
 }
 
+bool RubicsCube::isUnsolvable() const {
+	return !solvable;
+}
+
 const SmallCube& RubicsCube::getCube(short x, short y, short z) const {
 	return cubes[x][y][z];
 }
@@ -318,8 +325,10 @@ const Color& RubicsCube::getSideColor(int sideNumb) {
 }
 
 void RubicsCube::loadConfig(const std::string& fileName) {
+	solvable = true;
 	std::ifstream fin(fileName);
 	char side;
+	std::map<std::pair<char, int>, int> control;
 	for (int j(0); j < 6; ++j) {
 		fin >> side;
 		for (int i(0); i < 9; ++i) {
@@ -347,6 +356,70 @@ void RubicsCube::loadConfig(const std::string& fileName) {
 			default:
 				throw "Something went wrong (RubicsCube::loadConfig)";
 			}
+
+			switch (i) {
+			case 0:
+			case 2:
+			case 6:
+			case 8:
+				if (control.count({ color, 0 })) {
+					++control[{ color, 0 }];
+				} else {
+					control[{ color, 0 }] = 1;
+				}
+				break;
+			case 1:
+			case 3:
+			case 5:
+			case 7:
+				if (control.count({ color, 1 })) {
+					++control[{ color, 1 }];
+				} else {
+					control[{ color, 1 }] = 1;
+				}
+				break;
+			case 4:
+				if (control.count({ color, 2 })) {
+					++control[{ color, 2 }];
+				} else {
+					control[{ color, 2 }] = 1;
+				}
+				break;
+			default:
+				break;
+			}
+		}
+	}
+	for (const auto& cnt : control) {
+		switch (cnt.first.second) {
+		case 0:
+		case 1:
+			if (cnt.second != 4) {
+				solvable = false;
+			}
+			break;
+		case 2:
+			if (cnt.second != 1) {
+				solvable = false;
+			}
+			break;
+		default:
+			break;
+		}
+	}
+
+	for (int x(0); x < 3; ++x) {
+		for (int y(0); y < 3; ++y) {
+			for (int z(0); z < 3; ++z) {
+				const SmallCube& sCube = cubes[x][y][z];
+				for (int i(0); i < 6; ++i) {
+					for (int j(i + 1); j < 6; ++j) {
+						if (sCube.getSide(i) == sCube.getSide(j) && sCube.getSide(i) != BLACK) {
+							solvable = false;
+						}
+					}
+				}
+			}
 		}
 	}
 }
@@ -360,10 +433,24 @@ void RubicsCube::logConfig() const {
 	saveConfig(std::cout);
 }
 
+RubicsCube& RubicsCube::operator=(const RubicsCube& other) {
+	if (this == &other) {
+		return *this;
+	}
+	for (int i(0); i < 3; ++i) {
+		for (int j(0); j < 3; ++j) {
+			for (int k(0); k < 3; ++k) {
+				cubes[i][j][j] = other.cubes[i][j][k];
+			}
+		}
+	}
+	return *this;
+}
+
 void RubicsCube::saveConfig(std::ostream& cout) const {
 	std::vector<char> sides = { 'F', 'L', 'B', 'R', 'D', 'U' };
 	for (int j(0); j < 6; ++j) {
-		cout << "\'" << sides[j] << "\'" << '\n';
+		cout << sides[j] << '\n';
 		for (int i(0); i < 9; ++i) {
 			switch (sides[j]) {
 			case 'F':
